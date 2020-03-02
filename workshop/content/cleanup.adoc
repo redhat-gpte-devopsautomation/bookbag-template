@@ -1,0 +1,14 @@
+:USER_GUID: %GUID%
+:USERNAME: %USERNAME%
+:markup-in-source: verbatim,attributes,quotes
+:show_solution: true
+
+== Cleanup
+
+// Describe the cleanup procedure
+
+*DO NOT DO THIS SECTION IF YOU DON'T HAVE A PROBLEM*
+
+Only do things here if you have a major problem that you cannot figure out and need to get back to a good place.
+
+WARNING: If you deviated from the instructions in this lab and named things differently than instructed, these steps might not work.

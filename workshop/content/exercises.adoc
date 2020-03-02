@@ -1,0 +1,8 @@
+:USER_GUID: %GUID%
+:USERNAME: %USERNAME%
+:markup-in-source: verbatim,attributes,quotes
+:show_solution: true
+
+== Installation
+
+// Describe the installation process (if necessary)

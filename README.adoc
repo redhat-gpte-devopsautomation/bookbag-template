@@ -1,0 +1,30 @@
+= Bookbag Template
+
+This repository should be used as a template for creating (converting) lab content to
+be used in Bookbag environments. 
+
+. Create a new repository using this one as a template
+
+. Define which modules you want to include in your lab
+
+. List the modules in the `workshop.yaml` file
+
+. Edit the `modules.yaml` file to specify modules names and transitions
+
+. Edit the modules Asciidoc files (`workshop/content/*.adoc)
+
+. Define which variables you are going to use in your lab instructions (e.g. GUID, USERNAME, etc.)
+
+. Edit the `config.js` file to include those variables from the environment
+
+. Use those variables in Asciidoc files like this: `{USERNAME}`. 
+Avoid mixing environment variables you use in shell commands and variables you use in Asciidoc text.
+For example, you might use `${GUID}` in your shell commands--in this case use `{USER_GUID}` in
+the text.
+
+
+'''
+
+The code here is derived from https://github.com/openshift-homeroom.
+This repository is based on https://github.com/openshift-homeroom/lab-asciidoc-sample
+
