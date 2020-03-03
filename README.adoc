@@ -3,6 +3,8 @@
 This repository should be used as a template for creating (converting) lab content to
 be used in Bookbag environments. 
 
+== Creating (converting) Lab Content
+
 . Create a new repository using this one as a template (use the green button *Use this template*).
 
 . Define which modules you want to include in your lab.
@@ -21,6 +23,39 @@ be used in Bookbag environments.
 Avoid mixing environment variables you use in shell commands and variables you use in Asciidoc text.
 For example, you might use `${GUID}` in your shell commands--in this case use `{USER_GUID}` in
 the text.
+
+
+== Building the Bookbag Image
+
+There are two ways of building the Bookbag image.
+
+=== Docker build
+
+Just run the `docker build .` command from the project root directory.
+
+NOTE: Podman doesn't work properly on this build yet.
+
+=== Source-2-image build
+
+You'll need to be logged in an OpenShift cluster to use S2I build.
+
+. Create a new OpenShift project.
++
+----
+$ oc new-project mylab-bookbag
+----
+
+. From the lab project's root directory run the following script: 
++
+----
+$ .workshop/scripts/build-workshop.sh
+----
++
+The above command will create a Bookbag image in the cluster's internal image registry 
+(usually located at `image-registry.openshift-image-registry.svc:5000/${PROJECT_NAME}`)
+
+== Deploying the Bookbag image
+
 
 
 '''
