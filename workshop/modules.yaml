@@ -1,7 +1,7 @@
 modules:
     overview:
         name: Workshop Overview
-        exit_sign: Connected vs. Disconnected
+        exit_sign: Lab Environment
     lab-environment:
         name: Lab Environment
         exit_sign: Prepare Environment
