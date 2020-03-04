@@ -1,9 +1,6 @@
 modules:
     overview:
         name: Workshop Overview
-        exit_sign: Lab Environment
-    lab-environment:
-        name: Lab Environment
         exit_sign: Prepare Environment
     prepare-environment:
         name: Prepare Environment
