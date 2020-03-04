@@ -56,8 +56,28 @@ The above command will create a Bookbag image in the cluster's internal image re
 
 == Deploying the Bookbag image
 
+To deploy a Bookbag with lab instructions on an OpenShift cluster:
 
+. Create a new OpenShift project or use an existing one:
++
+----
+$ oc new-project bookbag-test
+or
+$ oc project bookbag-test
+----
 
+. Enter the `deploy` directory and use the template like this:
++
+----
+$ oc process -f bookbag-template.yaml -p IMAGE=quay.io/panni/bookbag-test:0.0.1 -p SUFFIX="004" | oc apply -f -
+----
++
+* Use the parameter `IMAGE` to specify your Bookbag image. 
+It can be located either in your internal OpenShift registry or externally on *quay.io*, for example.
++
+* Use the parameter `SUFFIX` to create several separate Bookbags for different users, for example.
+
+. The template creates a dummy ConfigMap with lab parameters.
 '''
 
 The code here is derived from https://github.com/openshift-homeroom.
