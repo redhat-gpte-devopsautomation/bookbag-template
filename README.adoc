@@ -1,3 +1,6 @@
+:markup-in-source: verbatim,attributes,quotes
+
+
 = Bookbag Template
 
 This repository should be used as a template for creating (converting) lab content to
@@ -36,14 +39,16 @@ You'll need to be logged in an OpenShift cluster to use S2I build.
 
 . Create a new OpenShift project.
 +
+[source,subs="{markup-in-source}"]
 ----
-$ oc new-project mylab-bookbag
+$ *oc new-project mylab-bookbag*
 ----
 
 . From the lab project's root directory run the following script: 
 +
+[source,subs="{markup-in-source}"]
 ----
-$ .workshop/scripts/build-workshop.sh
+$ *.workshop/scripts/build-workshop.sh*
 ----
 +
 The above command will create a Bookbag image in the cluster's internal image registry 
@@ -55,16 +60,18 @@ To deploy a Bookbag with lab instructions on an OpenShift cluster:
 
 . Create a new OpenShift project or use an existing one:
 +
+[source,subs="{markup-in-source}"]
 ----
-$ oc new-project bookbag-test
+$ *oc new-project bookbag-test*
 or
-$ oc project bookbag-test
+$ *oc project bookbag-test*
 ----
 
 . Enter the `deploy` directory and use the template like this:
 +
+[source,subs="{markup-in-source}"]
 ----
-$ oc process -f bookbag-template.yaml -p IMAGE=quay.io/panni/bookbag-test:0.0.1 -p NAME="bookbag-004" | oc apply -f -
+$ *oc process -f bookbag-template.yaml -p IMAGE=quay.io/panni/bookbag-test:0.0.1 -p NAME="bookbag-004" | oc apply -f -*
 ----
 +
 * Use the parameter `IMAGE` to specify your Bookbag image. 
@@ -74,16 +81,18 @@ It can be located either in your internal OpenShift registry or externally on *q
 
 . Check if everything was created properly and the Bookbag Pod is running:
 +
+[source,subs="{markup-in-source}"]
 ----
-$ oc get pods
+$ *oc get pods*
 NAME                           READY   STATUS    RESTARTS   AGE
 bookbag-004-8785fd986-jdj42    2/2     Running   0           2m
 ----
 
 . Get the Bookbag's Route:
 +
+[source,subs="{markup-in-source}"]
 ----
-$ oc get route -lapp=bookbag-004
+$ *oc get route -lapp=bookbag-004*
 NAME          HOST/PORT                                                                   PATH   SERVICES      PORT        TERMINATION     WILDCARD
 bookbag-004   bookbag-004-bookbag-test.apps.cluster-xxxx.xxxx.dev.open.redhat.com                bookbag-004   10080-tcp   edge/Redirect   None
 ----
@@ -145,8 +154,9 @@ Here are your informational messages:
 
 . Use the following command to deploy the image and pass the variables:
 +
+[source,subs="{markup-in-source}"]
 ----
-$ oc process -f ./deploy/bookbag-template.yaml -p IMAGE=<image_location> -p NAME=<bookbag_name> -p WORKSHOP_VARS="$(cat workshop-vars.json)" | oc apply -f -
+$ *oc process -f ./deploy/bookbag-template.yaml -p IMAGE=<image_location> -p NAME=<bookbag_name> -p WORKSHOP_VARS="$(cat workshop-vars.json)" | oc apply -f -*
 ----
 
 === Text formatting in preformatted parts
@@ -170,6 +180,16 @@ bookbag-005-5ffcccf9cf-584rt   2/2     Running   0          21h
 ----
 ------
 +
+It will look like this:
++
+[source,subs="{markup-in-source}"]
+----
+$ *oc get pods*
+NAME                           READY   STATUS    RESTARTS   AGE
+bookbag-005-5ffcccf9cf-584rt   2/2     Running   0          21h
+----
+
+
 It is recommended to use a bold font to distinguish the command user is expected to type on the keyboard
 from its output.
 Also, place a dollar sign prompt `$` in the beginning of the line. 
