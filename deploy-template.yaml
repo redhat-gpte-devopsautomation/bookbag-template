@@ -15,11 +15,12 @@ parameters:
   - name: NAME
     required: true
     value: bookbag
+  - name: IMAGE_STREAM_NAME
+    required: true
+    value: bookbag
+  - name: IMAGE_STREAM_NAMESPACE
   - name: IMAGE
-    required: true
-  - name: IMAGE_PULL_POLICY
-    required: true
-    value: IfNotPresent
+    value: set-by-trigger
   - name: OPENSHIFT_CONSOLE_IMAGE
     required: true
     value: quay.io/openshift/origin-console:4.2
@@ -52,8 +53,8 @@ objects:
     - kind: ServiceAccount
       name: ${NAME}
 
-  - apiVersion: extensions/v1beta1
-    kind: Deployment
+  - apiVersion: apps.openshift.io/v1
+    kind: DeploymentConfig
     metadata:
       labels:
         app: ${NAME}
@@ -61,10 +62,21 @@ objects:
     spec:
       replicas: 1
       selector:
-        matchLabels:
-          name: ${NAME}
+        name: ${NAME}
       strategy:
         type: Recreate
+      triggers:
+        - type: ConfigChange
+        - type: ImageChange
+          imageChangeParams:
+            automatic: true
+            containerNames:
+              - setup-console
+              - terminal
+            from:
+              kind: ImageStreamTag
+              name: ${IMAGE_STREAM_NAME}:latest
+              namespace: ${IMAGE_STREAM_NAMESPACE}
       template:
         metadata:
           labels:
@@ -79,10 +91,6 @@ objects:
               configMap:
                 defaultMode: 0644
                 name: ${NAME}-env
-            - name: workshopvars
-              configMap:
-                defaultMode: 0644
-                name: ${NAME}-vars
             - name: shared
               emptyDir: {}
           initContainers:
@@ -99,13 +107,11 @@ objects:
                 - name: ODO_VERSION
                 - name: KUBECTL_VERSION
               image: ${IMAGE}
-              imagePullPolicy: ${IMAGE_PULL_POLICY}
+              imagePullPolicy: IfNotPresent
               resources: {}
               volumeMounts:
                 - mountPath: /var/run/workshop
                   name: shared
-                - mountPath: /var/run/workshop-vars
-                  name: workshopvars
           containers:
             - name: terminal
               env:
@@ -128,7 +134,7 @@ objects:
                 - name: WORKSHOP_VARS
                   value: ${WORKSHOP_VARS}
               image: ${IMAGE}
-              imagePullPolicy: ${IMAGE_PULL_POLICY}
+              imagePullPolicy: IfNotPresent
               ports:
                 - containerPort: 10080
                   protocol: TCP
@@ -203,11 +209,3 @@ objects:
       labels:
         app: ${NAME}
       name: ${NAME}-env
-
-  - apiVersion: v1
-    data: {}
-    kind: ConfigMap
-    metadata:
-      labels:
-        app: ${NAME}
-      name: ${NAME}-vars

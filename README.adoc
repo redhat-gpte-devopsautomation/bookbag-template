@@ -18,7 +18,7 @@ be used in Bookbag environments.
 
 . Edit the modules Asciidoc files (`workshop/content/*.adoc`).
 
-. Define which variables you are going to use in your lab instructions (e.g. `GUID`, `user`, `messages`, and custom variables set by `agnosticd_user_info`).
+. Define which variables you are going to use in your lab instructions (e.g. `GUID`, `user`, `user_info_messages`, and custom variables set by `agnosticd_user_info`).
 (This is explained in more detail below.)
 
 
@@ -44,48 +44,43 @@ You'll need to be logged in an OpenShift cluster to use S2I build.
 $ *oc new-project mylab-bookbag*
 ----
 
-. From the lab project's root directory run the following script: 
+. Create the bookbag BuildConfig and ImageStream
 +
 [source,subs="{markup-in-source}"]
 ----
-$ *.workshop/scripts/build-workshop.sh*
+$ *oc process -f build-template.yaml -p NAME="bookbag" -p GIT_REPO="https://github.com/<ACCOUNT>/<LABREPO>.git" | oc apply -f -*
+----
+
+. Build your Bookbag Image from Git:
++
+[source,subs="{markup-in-source}"]
+----
+$ *oc start-build bookbag --follow*
 ----
 +
-The above command will create a Bookbag image in the cluster's internal image registry 
-(usually located at `image-registry.openshift-image-registry.svc:5000/${PROJECT_NAME}`)
+Or build from local source (aka "binary build"):
++
+[source,subs="{markup-in-source}"]
+----
+$ *oc start-build bookbag --follow --from-dir=.*
+----
 
 == Deploying the Bookbag image
 
 To deploy a Bookbag with lab instructions on an OpenShift cluster:
 
-. Create a new OpenShift project or use an existing one:
+. Use your existing OpenShift project namespace where you built the image:
 +
 [source,subs="{markup-in-source}"]
 ----
-$ *oc new-project bookbag-test*
-or
-$ *oc project bookbag-test*
+$ *oc project mylab-bookbag*
 ----
 
-. Enter the `deploy` directory and use the template like this:
+. Process the deploy template:
 +
 [source,subs="{markup-in-source}"]
 ----
-$ *oc process -f bookbag-template.yaml -p IMAGE=quay.io/panni/bookbag-test:0.0.1 -p NAME="bookbag-004" | oc apply -f -*
-----
-+
-* Use the parameter `IMAGE` to specify your Bookbag image. 
-It can be located either in your internal OpenShift registry or externally on *quay.io*, for example.
-+
-* Use the parameter `NAME` to create several separate Bookbags for different users, for example.
-
-. Check if everything was created properly and the Bookbag Pod is running:
-+
-[source,subs="{markup-in-source}"]
-----
-$ *oc get pods*
-NAME                           READY   STATUS    RESTARTS   AGE
-bookbag-004-8785fd986-jdj42    2/2     Running   0           2m
+$ *oc process -f deploy-template.yaml -p NAME="bookbag" -p IMAGE_STREAM_NAME="bookbag" | oc apply -f -*
 ----
 
 . Get the Bookbag's Route:
@@ -97,7 +92,7 @@ NAME          HOST/PORT                                                         
 bookbag-004   bookbag-004-bookbag-test.apps.cluster-xxxx.xxxx.dev.open.redhat.com                bookbag-004   10080-tcp   edge/Redirect   None
 ----
 
-. Use this Route to open the Bookbag page in your browser.
+. Use this Route hostname to open the Bookbag page in your browser.
 
 
 == Customizing Lab Instructions for Bookbag
@@ -131,7 +126,7 @@ you can pass the actual GUID to the Bookbag container and create a URL that can 
 ----
 {
     "GUID": "acdc",
-    "messages": "hello\nworld\n",
+    "user_info_messages": "hello\nworld\n",
     "some_custom_var": "example"
 }
 ----
@@ -175,7 +170,7 @@ Here are your informational messages:
 +
 [source,subs="{markup-in-source}"]
 ----
-$ *oc process -f ./deploy/bookbag-template.yaml -p IMAGE=<image_location> -p NAME=<bookbag_name> -p WORKSHOP_VARS="$(cat workshop-vars.json)" | oc apply -f -*
+$ *oc process -f deploy-template.yaml -p NAME="bookbag" -p IMAGE_STREAM_NAME="bookbag" -p WORKSHOP_VARS="$(cat workshop-vars.json)" | oc apply -f -*
 ----
 
 === Text formatting in preformatted parts
