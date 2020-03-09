@@ -18,7 +18,7 @@ be used in Bookbag environments.
 
 . Edit the modules Asciidoc files (`workshop/content/*.adoc`).
 
-. Define which variables you are going to use in your lab instructions (e.g. `GUID`, `USERNAME`, etc.).
+. Define which variables you are going to use in your lab instructions (e.g. `GUID`, `user`, `messages`, and custom variables set by `agnosticd_user_info`).
 (This is explained in more detail below.)
 
 
@@ -112,19 +112,37 @@ For example you can use bold font for commands that the user should input on the
 italic for parameters that should be replaced, etc.
 You can make certain parts of the output bold to attract attention to the changes.
 
-=== Environment variables in Acsiidoc
+=== AgnosticD User Info in Acsiidoc
+
+Bookbag pods will be deployed and configured so that information set by `agnosticd_user_info` when provisioning the lab is accessible within the content as macros.
+In production your bookbag pods will be deployed for you with these settings.
+During content development you will likely want to pass thes yourself.
+
+All lab environments have a variable, `GUID` set.
+Single-user lab environments also have `user_info_messages` set, containing any messages passed with `agnosticd_user_info`, concatenated into a string with line breaks.
+For multi-user lab environments, the variable `user` may be used to get the user name and `user_info_messages` is not available.
 
 You can pass environment variable to the Bookbag container and then use them in lab instructions.
 For example, instead of telling the user: "Use this URL and don't forget to replace 'GUID' with your actual GUID"
 you can pass the actual GUID to the Bookbag container and create a URL that can be copied and pasted without any changes.
 
-. Create a file called `workshop-vars.js` and define your variables like this:
+. Create a file called `workshop-vars.js` and define your variables like this for a single-user lab environment:
 +
 ----
 {
     "GUID": "acdc",
-    "USERNAME": "panni-redhat.com",
-    "user_info_messages": "hello\nworld\n"
+    "messages": "hello\nworld\n",
+    "some_custom_var": "example"
+}
+----
++
+Or if developing for a multi-user lab environment:
++
+----
+{
+    "GUID": "acdc",
+    "user": "student1",
+    "some_custom_var": "example"
 }
 ----
 
@@ -132,7 +150,8 @@ you can pass the actual GUID to the Bookbag container and create a URL that can 
 ("attributes" is the Asciidoc's word for variables). Here is the example:
 ----
 :USER_GUID: %GUID%
-:USERNAME: %USERNAME%
+:USERNAME: %user%
+:CUSTOM_VAR: %some_custom_var%
 ----
 
 . Use those variables in Asciidoc files like this: `You username for this lab is {USERNAME}`. 
