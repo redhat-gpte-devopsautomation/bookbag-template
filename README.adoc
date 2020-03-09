@@ -1,7 +1,15 @@
 :markup-in-source: verbatim,attributes,quotes
 
 
+
 = Bookbag Template
+
+NOTE: This project is based on OpenShift Homeroom: https://github.com/openshift-homeroom.
+This repository is based on https://github.com/openshift-homeroom/lab-asciidoc-sample.
+If you are using OpenShift Homeroom project already, please continue using it.
+If you want to integrate it with AgnosticD and Babylon, follow the instructions in 
+<<For the existing Homeroom users>>
+
 
 This repository should be used as a template for creating (converting) lab content to
 be used in Bookbag environments. 
@@ -210,8 +218,20 @@ Also, place a dollar sign prompt `$` in the beginning of the line.
 If the command should be run as root, place a hash `#`.
 
 
-'''
+== For the existing Homeroom users
 
-The code here is derived from https://github.com/openshift-homeroom.
-This repository is based on https://github.com/openshift-homeroom/lab-asciidoc-sample
+If you want to pass some parameters from your AgnosticD deployment to the Bookbag pod,
+use the `agnosticd_user_info` module in your `workload` or `post_software` task as shown in the following link:https://github.com/redhat-cop/agnosticd/blob/development/ansible/roles/ocp4-workload-authentication/tasks/workload.yml#L91-L99[example]:
+
+----
+  - name: Print User Information for each User
+    agnosticd_user_info:
+      user: "{{ ocp4_idm_htpasswd_user_base }}{{ n }}"
+      data:
+        password: "{{ ocp4_idm_htpasswd_user_password }}"
+        login_command: "oc login -u {{ ocp4_idm_htpasswd_user_base }}{{ n }} -p {{ ocp4_idm_htpasswd_user_password }} {{ r_cluster.resources[0].status.apiServerURL }}"
+    loop: "{{ range(1, 1 + ocp4_idm_htpasswd_user_count | int) | list }}"
+    loop_control:
+      loop_var: n
+----
 
