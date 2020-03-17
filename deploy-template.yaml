@@ -34,25 +34,6 @@ parameters:
     value: ''
 
 objects:
-  - apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      labels:
-        app: ${NAME}
-      name: ${NAME}
-
-  - apiVersion: v1
-    kind: RoleBinding
-    metadata:
-      labels:
-        app: ${NAME}
-      name: ${NAME}
-    roleRef:
-      name: admin
-    subjects:
-    - kind: ServiceAccount
-      name: ${NAME}
-
   - apiVersion: apps.openshift.io/v1
     kind: DeploymentConfig
     metadata:
@@ -85,12 +66,7 @@ objects:
         spec:
           dnsPolicy: ClusterFirst
           restartPolicy: Always
-          serviceAccountName: ${NAME}
           volumes:
-            - name: envvars
-              configMap:
-                defaultMode: 0644
-                name: ${NAME}-env
             - name: shared
               emptyDir: {}
           initContainers:
@@ -126,8 +102,6 @@ objects:
                   value: ${NAME}
                 - name: DOWNLOAD_URL
                 - name: WORKSHOP_FILE
-                - name: CONSOLE_URL
-                  value: http://0.0.0.0:10083
                 - name: OC_VERSION
                 - name: ODO_VERSION
                 - name: KUBECTL_VERSION
@@ -138,30 +112,6 @@ objects:
               ports:
                 - containerPort: 10080
                   protocol: TCP
-              resources: {}
-              volumeMounts:
-                - mountPath: /opt/workshop/envvars
-                  name: envvars
-                - mountPath: /var/run/workshop
-                  name: shared
-            - name: console
-              command:
-                - /var/run/workshop/start-console.sh
-              env:
-                - name: BRIDGE_K8S_MODE
-                  value: in-cluster
-                - name: BRIDGE_LISTEN
-                  value: http://0.0.0.0:10083
-                - name: BRIDGE_BASE_PATH
-                  value: /console/
-                - name: BRIDGE_PUBLIC_DIR
-                  value: /opt/bridge/static
-                - name: BRIDGE_USER_AUTH
-                  value: disabled
-                - name: BRIDGE_BRANDING
-                  value: openshift
-              image: ${OPENSHIFT_CONSOLE_IMAGE}
-              imagePullPolicy: IfNotPresent
               resources: {}
               volumeMounts:
                 - mountPath: /var/run/workshop
@@ -198,14 +148,3 @@ objects:
       to:
         kind: Service
         name: ${NAME}
-
-  - apiVersion: v1
-    data:
-      gateway.sh: ""
-      terminal.sh: ""
-      workshop.sh: ""
-    kind: ConfigMap
-    metadata:
-      labels:
-        app: ${NAME}
-      name: ${NAME}-env

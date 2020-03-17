@@ -1,14 +1,26 @@
 :markup-in-source: verbatim,attributes,quotes
 
 
+
 = Bookbag Template
 
+NOTE: This project is based on OpenShift Homeroom: https://github.com/openshift-homeroom.
+This repository is based on https://github.com/openshift-homeroom/lab-asciidoc-sample.
+If you are using OpenShift Homeroom project already, please continue using it.
+If you want to integrate it with AgnosticD and Babylon, follow the instructions in
+<<For the existing Homeroom users>>
+
+
 This repository should be used as a template for creating (converting) lab content to
-be used in Bookbag environments. 
+be used in Bookbag environments.
 
 == Creating (converting) Lab Content
 
-. Create a new repository using this one as a template (use the green button *Use this template*).
+. Create a new repository using this one as a template (replace `mylab-bookbag` with your project name):
+.. `$ git clone --depth 1 https://gitlab.com/2020-summit-labs/bookbag-template.git mylab-bookbag`
+.. `$ cd mylab-bookbag`
+.. `$ git remote set-url origin git@gitlab.com:2020-summit-labs/mylab-bookbag.git`
+.. `$ git push -u origin --all`
 
 . Define which modules you want to include in your lab.
 
@@ -33,18 +45,18 @@ Just run the `docker build .` command from the project root directory.
 
 NOTE: Podman doesn't work properly on this build yet.
 
-=== Source-2-image build
+=== Building in OpenShift
 
 You'll need to be logged in an OpenShift cluster to use S2I build.
 
-. Create a new OpenShift project.
+. Create a new OpenShift project:
 +
 [source,subs="{markup-in-source}"]
 ----
 $ *oc new-project mylab-bookbag*
 ----
 
-. Create the bookbag BuildConfig and ImageStream
+. Create the bookbag BuildConfig and ImageStream:
 +
 [source,subs="{markup-in-source}"]
 ----
@@ -94,6 +106,20 @@ bookbag-004   bookbag-004-bookbag-test.apps.cluster-xxxx.xxxx.dev.open.redhat.co
 
 . Use this Route hostname to open the Bookbag page in your browser.
 
+=== Customizing Bookbag's Layout
+
+. By default Bookbag creates three frames: Lab instructions on the left and a terminal windows on the right.
+If you want to change the number of terminal windows, change the `TERMINAL_TAB` environment variable in the
+`envvars/gateway.sh` container to the following:
++
+* `split` split for two vertitically stacked terminals
+* `split/2` split twice for three vertitically stacked terminals
+* `disable` disable terminal tab entirely
+
+. If your lab content includes slides, a slides tab may be enabled using `ENABLE_SLIDES="true"` in `envvars/gateway.sh`.
+
+. If you are not using the OpenShift terminal or slides then you may wish to only include the workshop instructions.
+This may be done by setting `DEFAULT_PAGE="workshop"` in `envvars/gateway.sh`.
 
 == Customizing Lab Instructions for Bookbag
 
@@ -103,7 +129,7 @@ When editing your instructions for Bookbag some Asciidoc elements might be helpf
 * You can use environment variables throughout the text to provide users with lab-specific information such as
 GUID, user credentials, URLs, etc.
 * You can use font formatting such as *bold*, _italic_, etc. in command line and code examples.
-For example you can use bold font for commands that the user should input on the keyboard, 
+For example you can use bold font for commands that the user should input on the keyboard,
 italic for parameters that should be replaced, etc.
 You can make certain parts of the output bold to attract attention to the changes.
 
@@ -125,7 +151,7 @@ you can pass the actual GUID to the Bookbag container and create a URL that can 
 +
 ----
 {
-    "GUID": "acdc",
+    "guid": "acdc",
     "user_info_messages": "hello\nworld\n",
     "some_custom_var": "example"
 }
@@ -135,26 +161,26 @@ Or if developing for a multi-user lab environment:
 +
 ----
 {
-    "GUID": "acdc",
+    "guid": "acdc",
     "user": "student1",
     "some_custom_var": "example"
 }
 ----
 
-. In the beginning of each of your Asciidoc files include these variables and define Asciidoc's attributes 
+. In the beginning of each of your Asciidoc files include these variables and define Asciidoc's attributes
 ("attributes" is the Asciidoc's word for variables). Here is the example:
 ----
-:USER_GUID: %GUID%
+:USER_GUID: %guid%
 :USERNAME: %user%
 :CUSTOM_VAR: %some_custom_var%
 ----
 
-. Use those variables in Asciidoc files like this: `You username for this lab is {USERNAME}`. 
+. Use those variables in Asciidoc files like this: `You username for this lab is {USERNAME}`.
 Avoid mixing environment variables you use in shell commands and variables you use in Asciidoc text.
 For example, you might use `${GUID}` in your shell commands--in this case use `{USER_GUID}` in
 the text.
 
-. You may want to use a multi-line variable such as output of the deployment command with 
+. You may want to use a multi-line variable such as output of the deployment command with
 user information. The variable `user_info_messages` in the example above havs multi-line content.
 In this case use the `[%hardbreaks]` directive to preserve formatting, like this:
 +
@@ -206,12 +232,24 @@ bookbag-005-5ffcccf9cf-584rt   2/2     Running   0          21h
 
 It is recommended to use a bold font to distinguish the command user is expected to type on the keyboard
 from its output.
-Also, place a dollar sign prompt `$` in the beginning of the line. 
+Also, place a dollar sign prompt `$` in the beginning of the line.
 If the command should be run as root, place a hash `#`.
 
 
-'''
+== For the existing Homeroom users
 
-The code here is derived from https://github.com/openshift-homeroom.
-This repository is based on https://github.com/openshift-homeroom/lab-asciidoc-sample
+If you want to pass some parameters from your AgnosticD deployment to the Bookbag pod,
+use the `agnosticd_user_info` module in your `workload` or `post_software` task as shown in the following link:https://github.com/redhat-cop/agnosticd/blob/development/ansible/roles/ocp4-workload-authentication/tasks/workload.yml#L91-L99[example]:
+
+----
+  - name: Print User Information for each User
+    agnosticd_user_info:
+      user: "{{ ocp4_idm_htpasswd_user_base }}{{ n }}"
+      data:
+        password: "{{ ocp4_idm_htpasswd_user_password }}"
+        login_command: "oc login -u {{ ocp4_idm_htpasswd_user_base }}{{ n }} -p {{ ocp4_idm_htpasswd_user_password }} {{ r_cluster.resources[0].status.apiServerURL }}"
+    loop: "{{ range(1, 1 + ocp4_idm_htpasswd_user_count | int) | list }}"
+    loop_control:
+      loop_var: n
+----
 
