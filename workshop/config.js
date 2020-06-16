@@ -10,7 +10,7 @@ function initialize(workshop) {
             if (files[i].match(/^[a-zA-Z_][a-zA-Z0-9_]+$/)) {
                 console.log(files[i])
                 workshop.data_variable(files[i], fs.readFileSync('/var/run/workshop-vars/' + files[i], 'utf8'));
-	    }
+            }
         }
     } catch(err) {
         console.log(err)

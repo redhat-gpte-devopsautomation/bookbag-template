@@ -9,8 +9,6 @@ RUN rm -rf /tmp/src/.git* && \
     chgrp -R 0 /tmp/src && \
     chmod -R g+w /tmp/src
 
-ENV TERMINAL_TAB=split
-
 USER 1001
 
 RUN /usr/libexec/s2i/assemble

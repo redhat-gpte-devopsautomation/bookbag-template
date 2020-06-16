@@ -5,7 +5,7 @@ message: |
 
 metadata:
   annotations:
-    openshift.io/display-name: Bookbag
+    openshift.io/display-name: Bookbag Build
     tags: gpte
     template.openshift.io/bindable: "false"
   name: bookbag-build

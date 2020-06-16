@@ -1,7 +1,7 @@
-name: OpenShift 4 UPI Disconnected Deployment
-
+---
+name: Bookbag Template
 modules:
-    activate:
+  activate:
     - overview
     - prepare-environment
     - exercises
