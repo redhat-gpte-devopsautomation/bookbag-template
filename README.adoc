@@ -16,11 +16,7 @@ be used in Bookbag environments.
 
 == Creating (converting) Lab Content
 
-. Create a new repository using this one as a template (replace `mylab-bookbag` with your project name):
-.. `$ git clone https://gitlab.com/2020-summit-labs/bookbag-template.git mylab-bookbag`
-.. `$ cd mylab-bookbag`
-.. `$ git remote set-url origin git@gitlab.com:2020-summit-labs/mylab-bookbag.git`
-.. `$ git push -u origin --all`
+. Create a new repository using this one as a GitHub template.
 
 . Define which modules you want to include in your lab.
 
